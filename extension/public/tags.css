@@ -2,18 +2,36 @@
   display: inline-flex;
   align-items: center;
   flex-shrink: 0;
-  margin-inline-start: 6px;
-  padding: 1px 6px;
-  border: 1px solid currentColor;
+  margin-inline-start: 8px;
+  padding: 3px 9px;
+  border: 1px solid rgb(255 255 255 / 30%);
   border-radius: 999px;
-  background: transparent;
-  color: inherit;
-  font: 500 11px/1.4 system-ui, sans-serif;
+  background: var(--jev-category-color, #475569);
+  color: #fff;
+  box-shadow: 0 1px 3px rgb(0 0 0 / 20%);
+  font: 700 12px/1.4 system-ui, sans-serif;
   white-space: nowrap;
   vertical-align: middle;
   cursor: default;
-  opacity: .85;
 }
-.jev-post-tag[data-state="pending"], .jev-post-tag[data-state="empty"] { opacity: .55; }
-.jev-post-tag[data-state="error"] { cursor: pointer; border-style: dashed; }
+.jev-post-tag[data-state="pending"], .jev-post-tag[data-state="empty"] { background: #475569; }
+.jev-post-tag[data-state="error"] { cursor: pointer; border-style: dashed; background: #9f1239; }
+.jev-post-tag[data-filtered="true"]::after { content: " · Hidden"; font-weight: 500; }
 .jev-post-tag:focus-visible { outline: 2px solid #1d9bf0; outline-offset: 2px; }
+
+/* Hide every descendant while preserving layout, then reveal only the badge.
+   Visibility can be restored by a child even when its ancestors are hidden.
+   This avoids raising X's containers (and their videos) above a cover. */
+article[data-jev-filtered] {
+  background: #0f172a !important;
+  color: transparent !important;
+  pointer-events: none;
+}
+article[data-jev-filtered] * {
+  visibility: hidden !important;
+}
+article[data-jev-filtered] .jev-post-tag,
+article[data-jev-filtered] .jev-post-tag * {
+  visibility: visible !important;
+  pointer-events: auto;
+}

@@ -36,7 +36,18 @@ def test_classification_contract_and_private_key():
         }
         assert "test-secret" not in result.text
         assert client.get("/health").json() == {"status": "ok"}
-        assert len(client.get("/api/categories").json()) == 5
+        categories = client.get("/api/categories").json()
+        assert {category["id"]: category["label"] for category in categories} == {
+            "news": "News",
+            "ai": "AI",
+            "ai_generated": "AI-generated",
+            "tv": "TV",
+            "tech": "Tech",
+            "gaming": "Gaming",
+            "sports": "Sports",
+            "meme": "Meme",
+            "other": "Other",
+        }
     assert len(requests) == 1
     assert str(requests[0].url) == "https://api.typesafe.ai/v1/systemone"
     assert requests[0].headers["Authorization"] == "Bearer test-secret"

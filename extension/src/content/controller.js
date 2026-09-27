@@ -6,6 +6,7 @@ export class PostController {
     this.root = root;
     this.queue = queue;
     this.enabled = true;
+    this.hiddenCategories = new Set();
     this.states = new WeakMap();
     this.dirty = new Set();
     this.timer = null;
@@ -50,10 +51,15 @@ export class PostController {
   process(article) {
     if (!this.enabled || !article.isConnected) return;
     const post = extractPost(article);
-    if (!post) return;
+    if (!post) {
+      article.removeAttribute("data-jev-filtered");
+      article.querySelectorAll(TAG_SELECTOR).forEach((tag) => tag.remove());
+      return;
+    }
     const key = postKey(post);
     let state = this.states.get(article);
     if (!state || state.key !== key) {
+      article.removeAttribute("data-jev-filtered");
       article.querySelectorAll(TAG_SELECTOR).forEach((tag) => tag.remove());
       state = { key, status: post.text ? "pending" : "empty", result: null, error: "" };
       this.states.set(article, state);
@@ -70,9 +76,13 @@ export class PostController {
       }
     }
     if (state.status === "ready") {
+      const filtered = this.hiddenCategories.has(state.result.category);
+      article.toggleAttribute("data-jev-filtered", filtered);
       renderTag(post.anchor, {
         label: state.result.label,
-        title: `Jev: ${state.result.label} · ${Math.round(state.result.confidence * 100)}% confidence`,
+        category: state.result.category,
+        filtered,
+        title: `Jev: ${state.result.label} · ${Math.round(state.result.confidence * 100)}% confidence${filtered ? " · Hidden by your category filter" : ""}`,
       });
     } else if (state.status === "error") {
       renderTag(post.anchor, {
@@ -86,12 +96,20 @@ export class PostController {
     }
   }
 
+  setHiddenCategories(categories) {
+    this.hiddenCategories = new Set(categories);
+    this.scan();
+  }
+
   setEnabled(enabled) {
     this.enabled = enabled;
     if (!enabled) {
       this.queue.cancelQueued();
       this.states = new WeakMap();
       this.root.querySelectorAll(TAG_SELECTOR).forEach((tag) => tag.remove());
+      this.root.querySelectorAll("[data-jev-filtered]").forEach((article) => {
+        article.removeAttribute("data-jev-filtered");
+      });
     } else this.scan();
   }
 

@@ -1,6 +1,6 @@
 # Jev X post tags
 
-A Chrome extension that classifies newly loaded X/Twitter posts using Jev (TypeSafe AI), then puts a small topic tag beside the post timestamp. Initial categories: **Politics, AI, Gaming, Meme, Other**.
+A Chrome extension that classifies newly loaded X/Twitter posts using Jev (TypeSafe AI), then puts a bold, colored topic tag beside the post timestamp. Categories: **News, AI, AI-generated, TV, Tech, Gaming, Sports, Meme, Other**. News includes politics; TV covers movies and television; Tech covers technology outside AI.
 
 Each new text post has its own HTTP request. The extension runs up to six requests concurrently per tab; the async Python backend supports up to twelve concurrent Jev calls by default. No batching.
 
@@ -40,13 +40,15 @@ Use `npm` instead of `npm.cmd` on macOS/Linux. On Windows, `npm.cmd` works witho
 3. Open or refresh an X/Twitter tab. Posts receive a `Tagging…` indicator, then a category beside their date.
 4. Scroll to load more posts. Hover a tag to see Jev's confidence.
 
-The toolbar popup shows backend connectivity and lets you pause classification across tabs. Pausing cancels queued work and hides tags; requests already sent may finish. Failures show a **Retry** tag with an explanatory tooltip; click to retry after resolving the problem. Requests are not automatically retried, avoiding unexpected duplicate API usage.
+The toolbar popup shows backend connectivity, category checkboxes, and a pause switch. All categories start selected. Uncheck a category to hide its posts' contents against a solid dim background while keeping the colored tag visible with a **Hidden** indicator. Check it again to restore those posts immediately. Selections persist across browser restarts and apply to all open X tabs without extra classification requests. Newly classified posts are filtered as soon as their result arrives; pending, failed, and textless posts remain visible.
+
+Pausing cancels queued work, hides tags, and restores all post contents; requests already sent may finish. Resuming restores your saved filters. Failures show a **Retry** tag with an explanatory tooltip; click to retry after resolving the problem. Requests are not automatically retried, avoiding unexpected duplicate API usage.
 
 After editing extension code, rebuild, reload the extension in `chrome://extensions`, and refresh the X tab.
 
 ## Configure categories
 
-Edit `backend/src/jev_backend/categories.json`, then restart the backend and refresh X. Each category has a stable `id`, a short display `label`, and a `description` used as Jev's classification criterion. Keep 2–20 unique categories, including `other` as a fallback. Category labels come from the backend, so adding categories needs no extension code changes.
+Edit `backend/src/jev_backend/categories.json`, then restart the backend and refresh X. Each category has a stable `id`, a short display `label`, and a `description` used as Jev's classification criterion. Keep 2–20 unique categories, including `other` as a fallback. The popup fetches the category list from the backend and caches it for offline use; extension builds also include the current list as an initial fallback. New categories start visible and receive a stable color. The default palette is in `extension/src/categories.js`.
 
 Optional root `.env` settings:
 
@@ -108,6 +110,8 @@ Tests use a mocked Jev provider; they do not consume API credits. To make **one 
 
 For a browser check, load the built extension, verify tags beside timestamps, scroll, navigate to a profile, pause/resume from the popup, and stop the backend to verify the retry state. X markup can change independently of this project; DOM selectors live in `extension/src/content/posts.js`.
 
+Uncheck a category while its posts are visible and while new posts are being classified; only matching posts should have their contents hidden, with their tags still readable. `extension/test/fixtures/filter.html` is a standalone browser regression fixture for this CSS, including nested stacking contexts and video, and reports PASS/FAIL without X or API requests.
+
 ## Data and current scope
 
 - The Jev key stays in the Python process. It is never bundled into the extension or returned to the browser.
@@ -116,6 +120,7 @@ For a browser check, load the built extension, verify tags beside timestamps, sc
 - Posts loaded by X may be classified before they enter the viewport. Refreshing tabs and expanding posts can produce additional paid API requests.
 - Backend request logging contains paths/statuses, not post bodies or credentials. There is no database or persistent classification history.
 - The local API restricts browser origins and host headers. It has no user authentication and must remain bound to loopback. Overload returns a retryable error rather than growing a backend queue.
-- Tags are informational; posts are not hidden or removed.
+- Unselected categories retain their timeline space, but all post content is invisible except the category tag. Filter preferences and the category list are stored locally in Chrome; classification results remain in page memory.
+- AI-generated identifies posts presenting generated creations based on textual evidence. It does not verify authorship or detect synthetic images/video. Ordinary AI discussion stays in AI.
 
 Integration references: [TypeSafe quick start](https://docs.typesafe.ai/introduction/quickstart), [TypeSafe API reference](https://docs.typesafe.ai/api), and [Chrome cross-origin requests](https://developer.chrome.com/docs/extensions/develop/concepts/network-requests).

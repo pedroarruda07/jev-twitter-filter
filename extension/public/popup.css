@@ -1,8 +1,17 @@
 :root { color-scheme: light dark; font: 14px/1.5 system-ui, sans-serif; }
-body { width: 280px; margin: 0; padding: 20px; }
+body { width: 310px; margin: 0; padding: 20px; }
 h1 { margin: 0 0 18px; font-size: 22px; }
 h1 span { font-size: 15px; font-weight: 400; opacity: .65; }
 label { display: flex; align-items: center; gap: 8px; font-weight: 600; }
 input { accent-color: #1d9bf0; width: 17px; height: 17px; }
 p { font-size: 12px; opacity: .75; }
 .connected { color: #18976a; opacity: 1; }
+fieldset { border: 0; border-top: 1px solid #8885; margin: 18px 0 0; padding: 12px 0 0; }
+legend { font-weight: 700; padding-inline-end: 10px; }
+.hint { margin: 0 0 12px; }
+#categories { display: grid; grid-template-columns: 1fr 1fr; gap: 10px 8px; }
+.category-option { gap: 7px; cursor: pointer; }
+.category-option input { flex-shrink: 0; margin: 0; }
+.category-chip { padding: 3px 8px; border-radius: 999px; color: #fff; font-size: 12px; font-weight: 700; }
+.category-option:has(input:not(:checked)) .category-chip { opacity: .5; }
+#filter-status:empty { display: none; }

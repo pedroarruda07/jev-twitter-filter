@@ -1,7 +1,11 @@
 [
-  {"id": "politics", "label": "Politics", "description": "Governments, elections, public policy, political figures or political debate."},
+  {"id": "news", "label": "News", "description": "General news, current events, world affairs, governments, elections, public policy or political debate. Prefer a more specific topic category for AI, technology, gaming or entertainment news."},
   {"id": "ai", "label": "AI", "description": "Artificial intelligence, machine learning, AI models, AI tools or AI research."},
+  {"id": "ai_generated", "label": "AI-generated", "description": "Posts presenting AI-generated creations, such as synthetic images, video, music or writing, when the text provides clear evidence such as an explicit AI-generated label or a description of generating the featured work with an AI tool. Discussion of AI technology belongs in AI. Do not infer authorship from writing style alone."},
+  {"id": "tv", "label": "TV", "description": "Movies, television shows, streaming series, actors, directors, trailers, reviews or related film and television entertainment."},
+  {"id": "tech", "label": "Tech", "description": "Non-AI technology: software, programming, gadgets, computers, phones, cybersecurity, networks or technology companies. Posts primarily about artificial intelligence belong in AI; gaming-focused posts belong in Gaming."},
   {"id": "gaming", "label": "Gaming", "description": "Video games, gaming hardware, esports, game releases or playing games."},
+  {"id": "sports", "label": "Sports", "description": "Professional or amateur sports, athletes, teams, leagues, matches, tournaments, scores, trades or sports commentary. Allow only football, F1, volleyball and olympic games related posts to fall under this category. Other Sports should fall under the Other category even though they are still Sports."},
   {"id": "meme", "label": "Meme", "description": "Jokes, humorous internet culture, satire or memes whose main purpose is entertainment."},
   {"id": "other", "label": "Other", "description": "Content that does not clearly fit any of the other categories, or lacks enough context."}
 ]

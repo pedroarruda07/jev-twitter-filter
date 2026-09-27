@@ -10,6 +10,12 @@
     <h1>Jev <span>post tags</span></h1>
     <label><input id="enabled" type="checkbox"> Classify posts on X</label>
     <p id="status" role="status">Checking backend…</p>
+    <fieldset>
+      <legend>Show categories</legend>
+      <p class="hint">Uncheck a category to cover its posts. Tags stay visible.</p>
+      <div id="categories">Loading categories…</div>
+      <p id="filter-status" role="status"></p>
+    </fieldset>
     <p>Post text is sent to your local backend and TypeSafe AI. Tags appear beside each post’s date.</p>
     <script src="popup.js" type="module"></script>
   </body>

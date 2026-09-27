@@ -4,6 +4,7 @@ import { JSDOM } from "jsdom";
 import { extractPost } from "../src/content/posts.js";
 import { ClassificationQueue } from "../src/content/classifier.js";
 import { PostController } from "../src/content/controller.js";
+import { categoryColor } from "../src/categories.js";
 
 function markup(id, text = "An AI model") {
   return `<article data-testid="tweet"><div><a role="link" href="/person/status/${id}"><time>2h</time></a></div><div data-testid="tweetText">${text}</div></article>`;
@@ -106,6 +107,64 @@ test("pause removes tags and resume reuses cached results", async () => {
   await wait();
   assert.equal(document.querySelector(".jev-post-tag").textContent, "AI");
   assert.equal(calls, 1);
+  controller.stop();
+  dom.window.close();
+});
+
+test("saved filters apply on completion, toggle immediately, and restore after pause", async () => {
+  const dom = setup(markup("1"));
+  let release;
+  let calls = 0;
+  const controller = new PostController(document.body, new ClassificationQueue(() => {
+    calls++;
+    return new Promise((resolve) => { release = resolve; });
+  }));
+  controller.hiddenCategories = new Set(["ai_generated"]);
+  controller.start();
+  const article = document.querySelector("article");
+  assert.equal(article.hasAttribute("data-jev-filtered"), false);
+  await wait();
+  release({ category: "ai_generated", label: "AI-generated", confidence: 0.9 });
+  await wait();
+  assert.equal(article.hasAttribute("data-jev-filtered"), true);
+  const tag = article.querySelector(".jev-post-tag");
+  assert.equal(tag.textContent, "AI-generated");
+  assert.equal(tag.dataset.filtered, "true");
+  assert.equal(tag.style.getPropertyValue("--jev-category-color"), categoryColor("ai_generated"));
+  controller.setHiddenCategories([]);
+  assert.equal(article.hasAttribute("data-jev-filtered"), false);
+  assert.equal(tag.dataset.filtered, "false");
+  controller.setHiddenCategories(["ai_generated"]);
+  assert.equal(article.hasAttribute("data-jev-filtered"), true);
+  controller.setEnabled(false);
+  assert.equal(article.hasAttribute("data-jev-filtered"), false);
+  controller.setEnabled(true);
+  await wait();
+  assert.equal(article.hasAttribute("data-jev-filtered"), true);
+  assert.equal(calls, 1);
+  controller.stop();
+  dom.window.close();
+});
+
+test("recycled filtered posts clear filtering while the next classification is pending", async () => {
+  const dom = setup(markup("1"));
+  const releases = new Map();
+  const controller = new PostController(document.body, new ClassificationQueue((post) =>
+    new Promise((resolve) => releases.set(post.post_id, resolve))));
+  controller.hiddenCategories = new Set(["ai_generated"]);
+  controller.start();
+  await wait();
+  releases.get("1")({ category: "ai_generated", label: "AI-generated", confidence: 1 });
+  await wait();
+  const article = document.querySelector("article");
+  assert.equal(article.hasAttribute("data-jev-filtered"), true);
+  document.querySelector("a").href = "/person/status/2";
+  await wait();
+  assert.equal(article.hasAttribute("data-jev-filtered"), false);
+  releases.get("2")({ category: "tv", label: "TV", confidence: 1 });
+  await wait();
+  assert.equal(article.hasAttribute("data-jev-filtered"), false);
+  assert.equal(article.querySelector(".jev-post-tag").dataset.category, "tv");
   controller.stop();
   dom.window.close();
 });

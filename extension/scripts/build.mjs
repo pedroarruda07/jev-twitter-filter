@@ -19,4 +19,5 @@ await build({
 await Promise.all(["manifest.json", "popup.html", "popup.css", "tags.css"].map(
   (name) => copyFile(name === "manifest.json" ? name : `public/${name}`, `dist/${name}`),
 ));
+await copyFile("../backend/src/jev_backend/categories.json", "dist/categories.json");
 console.log("Load extension/dist as an unpacked extension in Chrome.");

@@ -12,3 +12,4 @@ node_modules/
 .npm-cache/
 extension/dist/
 coverage/
+.test-artifacts/
