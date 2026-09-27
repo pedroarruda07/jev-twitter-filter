@@ -1,0 +1,7 @@
+[
+  {"id": "politics", "label": "Politics", "description": "Governments, elections, public policy, political figures or political debate."},
+  {"id": "ai", "label": "AI", "description": "Artificial intelligence, machine learning, AI models, AI tools or AI research."},
+  {"id": "gaming", "label": "Gaming", "description": "Video games, gaming hardware, esports, game releases or playing games."},
+  {"id": "meme", "label": "Meme", "description": "Jokes, humorous internet culture, satire or memes whose main purpose is entertainment."},
+  {"id": "other", "label": "Other", "description": "Content that does not clearly fit any of the other categories, or lacks enough context."}
+]
