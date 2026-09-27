@@ -12,8 +12,12 @@ Requires Python 3.11+ and Node.js 22+ for extension development. Run these Power
 python -m venv .venv
 .\.venv\Scripts\python.exe -m pip install -r backend/requirements-dev.lock
 .\.venv\Scripts\python.exe -m pip install -e './backend[dev]'
-.\.venv\Scripts\python.exe -m uvicorn jev_backend.main:app --host 127.0.0.1 --port 8000
+.\.venv\Scripts\python.exe -m jev_backend.dev
 ```
+
+The development launcher automatically restarts the server when Python files or `categories.json` change in `backend/src/jev_backend`. It uses Uvicorn's [watchfiles reload support](https://www.uvicorn.org/settings/#reloading-with-watchfiles), installed with the dev dependencies. Stop any already running backend before switching to this command. Refresh X after changing categories or classification instructions to clear cached results. Changes to the root `.env` require a manual restart.
+
+To run without auto reload, use `.\.venv\Scripts\python.exe -m uvicorn jev_backend.main:app --host 127.0.0.1 --port 8000`.
 
 The existing root `.env` is loaded automatically. It must contain `JEV_API_KEY` with a TypeSafe API key. Keep that file private; `.env.example` documents optional settings. Do not overwrite your existing `.env` with the example.
 
